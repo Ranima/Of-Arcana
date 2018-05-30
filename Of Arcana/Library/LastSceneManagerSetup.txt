@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/TestJunk/TestScene.unity
+  isLoaded: 1
+  isActive: 1
