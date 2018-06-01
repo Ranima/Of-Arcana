@@ -6,6 +6,9 @@ public class PlayerMove : MonoBehaviour {
 
     public float moveMod = 3;
     public float jumpMod = 1;
+    public float stopMod = 0.8f;
+
+    private Vector3 move;
 
 	// Use this for initialization
 	void Start () {
@@ -14,7 +17,19 @@ public class PlayerMove : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        GetComponent<Rigidbody>().AddForce(new Vector3(Input.GetAxis("Horizontal") * moveMod, 0, Input.GetAxis("Vertical") * moveMod));
-        GetComponent<Rigidbody>().AddForce(new Vector3(0, Input.GetAxis("Jump") * jumpMod, 0));
+        Movement();
+        
 	}
+
+    void Movement()
+    {
+        move.x = Input.GetAxis("Horizontal") * moveMod;
+        move.z = Input.GetAxis("Vertical") * moveMod;
+        
+        GetComponent<Rigidbody>().AddForce(new Vector3(0, Input.GetAxis("Jump") * jumpMod, 0));
+
+        gameObject.transform.Translate(move);
+
+        move = move * stopMod;
+    }
 }
