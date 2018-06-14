@@ -6,21 +6,23 @@ public class PlayerMove : MonoBehaviour
 {
 
     public float moveMod = 3;
-    public float jumpMod = 1;
+    public float jumpforce = 1;
     public float stopMod = 0.8f;
     public float fallSpeed = 10;
     public float fallAcceleration = .8f;
-    public float surface = 60;
+    public float maxSurfaceAngle = 60;
+    public float distanceToGround = 1;
+    public bool isPlayer = false;
 
-    private CharacterController cc;
     private Vector3 move;
-    private bool grounded;
+    public bool grounded;
     private float maxFallSpeed;
+    private Ray down;
+    private RaycastHit hit;
 
     // Use this for initialization
     void Awake()
     {
-        cc = GetComponent<CharacterController>();
         maxFallSpeed = fallSpeed;
         fallSpeed = 0;
         grounded = false;
@@ -35,15 +37,21 @@ public class PlayerMove : MonoBehaviour
 
     void Movement()
     {
-        move.x = Input.GetAxis("Horizontal") * moveMod;
-        move.z = Input.GetAxis("Vertical") * moveMod;
+        if (grounded)
+        {
+            move.x = Input.GetAxis("Horizontal") * moveMod;
+            move.z = Input.GetAxis("Vertical") * moveMod;
+        }
 
         //gameObject.transform.Translate(move);
         Grounded();
+        Jump(Input.GetAxis("Jump"));
         Gravity(grounded);
-        cc.Move(move);
 
-        move = move * stopMod;
+        if (grounded)
+        {
+            move = move * stopMod;
+        }
     }
 
     void Gravity(bool t)
@@ -61,7 +69,10 @@ public class PlayerMove : MonoBehaviour
 
     void Grounded()
     {
-        if((cc.collisionFlags & CollisionFlags.Below) != 0)
+        down.origin = transform.position;
+        down.direction = Vector3.down;
+        Debug.DrawRay(down.origin, down.direction, Color.magenta);
+        if (Physics.Raycast(down, out hit, distanceToGround) && hit.normal.magnitude < maxSurfaceAngle && fallSpeed > -0.01)
         {
             grounded = true;
             fallSpeed = 0;
@@ -70,5 +81,15 @@ public class PlayerMove : MonoBehaviour
         {
             grounded = false;
         }
+        Debug.Log(grounded);
+    }
+
+    void Jump(float i)
+    {
+        if(i > 0.0 && grounded == true)
+        {
+            fallSpeed = -jumpforce;
+        }
     }
 }
+
